@@ -41,6 +41,17 @@ async def login_for_access_token(
     return schemas.Token(access_token=access_token, token_type="bearer")
 
 
+@app.post("/register_customer")
+async def register_customer()
+    """
+    customer : CustomerCreate(
+    username,
+    password
+    )
+    
+    """
+
+
 @app.get("/users/me/", response_model=schemas.User)
 async def read_users_me(
     current_user: schemas.User = Depends(get_current_active_user),
