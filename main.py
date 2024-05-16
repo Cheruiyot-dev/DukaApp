@@ -5,12 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 import schemas
-from schemas import CreateCustomerRequest
 from auth import authenticate_user, create_access_token, \
-      get_current_active_user, pwd_context
+      get_current_active_user
 from database import engine, Base, get_db
-from models import Customer, Product, Order, OrderItem
-from routers import customers, products, sales
+# from models import Customer, Product, Order, OrderItem
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
@@ -18,9 +16,9 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-app.include_router(customers.router)
-app.include_router(products.router)
-app.include_router(sales.router)
+@app.get("/")
+async def index():
+    return {"main": "trial endpoint"}
 
 
 @app.post("/token", response_model=schemas.Token)
@@ -44,30 +42,14 @@ async def login_for_access_token(
 
 
 @app.post("/register_customer")
-async def register_customer(customer: CreateCustomerRequest,
-                            db: Session = Depends(get_db)):
-    hashed_password = pwd_context.hash(customer.password)
-
-    # Check if the email already exists
-    existing_customer = db.query(Customer).filter(Customer.email == customer.email).first()
-    if existing_customer:
-        raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
-        )
-    # create a new customer
-    new_customer = Customer(username=customer.username,
-                            email=customer.email,
-                            password=hashed_password)
-    print(new_customer)
-    db.add(new_customer)
-    db.commit()
-    db.refresh(new_customer)
-
-    return new_customer
-
-# Product routes
-
+async def register_customer()
+    """
+    customer : CustomerCreate(
+    username,
+    password
+    )
+    
+    """
 
 
 @app.get("/users/me/", response_model=schemas.User)
