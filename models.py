@@ -24,24 +24,36 @@ class Customer(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(100), nullable=False)
-    hashed_password = Column(String(255), nullable=False)
+    password = Column(String(255), nullable=False)
     email = Column(String(100), nullable=False)
-    disabled = Column(Boolean, default=False)
 
     # Relationship with orders
     orders = relationship('Order', backref='customer')
+    sales = relationship('Sale', back_populates='customer')
 
 
 class Product(Base):
     __tablename__ = 'products'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
 
     # Relationship with order items
     order_items = relationship('OrderItem', backref='product')
+
+
+class Sale(Base):
+    __tablename__ = "sales"
+
+    id = Column(Integer, primary_key=True)
+    pid = Column(Integer, ForeignKey('products.id'), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
+
+    customer = relationship('Customer', backref='sale')
 
 
 class Order(Base):
