@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, \
-        Float, DateTime, Boolean
+        Float, DateTime
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -8,8 +8,7 @@ import os
 
 load_dotenv()
 
-
-# connecting to the database
+# Connecting to the database
 SQLALCHEMY_DATABASE_URL = os.getenv('DATABASE_URL')
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
@@ -17,7 +16,6 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-
 
 class Customer(Base):
     __tablename__ = "customers"
@@ -27,10 +25,9 @@ class Customer(Base):
     password = Column(String(255), nullable=False)
     email = Column(String(100), nullable=False)
 
-    # Relationship with orders
-    orders = relationship('Order', backref='customer')
+    # Relationship with orders and sales
+    orders = relationship('Order', back_populates='customer')
     sales = relationship('Sale', back_populates='customer')
-
 
 class Product(Base):
     __tablename__ = 'products'
@@ -41,8 +38,7 @@ class Product(Base):
     price = Column(Float, nullable=False)
 
     # Relationship with order items
-    order_items = relationship('OrderItem', backref='product')
-
+    order_items = relationship('OrderItem', back_populates='product')
 
 class Sale(Base):
     __tablename__ = "sales"
@@ -53,8 +49,7 @@ class Sale(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
 
-    customer = relationship('Customer', backref='sale')
-
+    customer = relationship('Customer', back_populates='sales')
 
 class Order(Base):
     __tablename__ = "orders"
@@ -64,10 +59,9 @@ class Order(Base):
     order_date = Column(DateTime, default=datetime.utcnow, nullable=False)
     customer_id = Column(Integer, ForeignKey('customers.id'))
 
-    # Relationship with Customer
-
-    order_items = relationship('OrderItem', backref='order')
-
+    # Relationship with Customer and OrderItems
+    customer = relationship('Customer', back_populates='orders')
+    order_items = relationship('OrderItem', back_populates='order')
 
 class OrderItem(Base):
     __tablename__ = "order_items"
@@ -76,3 +70,8 @@ class OrderItem(Base):
     order_quantity = Column(Integer, nullable=False)
     order_id = Column(Integer, ForeignKey('orders.id'))
     product_id = Column(Integer, ForeignKey('products.id'))
+
+    # Relationships
+    order = relationship('Order', back_populates='order_items')
+    product = relationship('Product', back_populates='order_items')
+

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 
@@ -9,6 +9,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+    id: Optional[str] = None
 
 
 class User(BaseModel):
@@ -24,14 +25,20 @@ class UserInDB(User):
 
 class CreateCustomerRequest(BaseModel):
     username: str
-    email: str
+    email: EmailStr
     password: str
 
 
 class CreateCustomerResponse(BaseModel):
     id: int
     username: str
-    email: str
+    email: EmailStr
+
+
+class User(BaseModel):
+    id: int
+    email: EmailStr
+    username: str
 
 
 class LoginRequest(BaseModel):

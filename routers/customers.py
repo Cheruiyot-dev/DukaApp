@@ -1,8 +1,7 @@
 from fastapi import APIRouter,  Depends, HTTPException, status
-from datetime import timedelta
 from sqlalchemy.orm import Session
-from schemas import CreateCustomerRequest, CreateCustomerResponse
-from database import  get_db
+from schemas import CreateCustomerRequest, CreateCustomerResponse, User
+from database import get_db
 from models import Customer
 from sqlalchemy import or_
 from utility import pwd_context
@@ -14,8 +13,7 @@ router = APIRouter()
 async def register_customer(customer: CreateCustomerRequest,
                             db: Session = Depends(get_db)) -> \
                                 CreateCustomerResponse:
-    existing_customer = db.query(Customer).filter\
-        (or_(Customer.email == customer.email, Customer.username == customer.username)).first()
+    existing_customer = db.query(Customer).filter(or_(Customer.email == customer.email, Customer.username == customer.username)).first()
     if existing_customer:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -42,3 +40,15 @@ async def register_customer(customer: CreateCustomerRequest,
         email=new_customer.email)
 
     return response
+
+
+@router.get("/{customer_id}", status_code=status.HTTP_200_OK,
+            response_model=User)
+def get_customer(customer_id: int, db: Session = Depends(get_db)):
+    customer = db.query(Customer).filter(Customer.id == customer_id).first()
+
+    if not customer:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"User with id:{customer_id} does not exist")
+
+    return customer
