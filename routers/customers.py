@@ -6,7 +6,10 @@ from models import Customer
 from sqlalchemy import or_
 from utility import pwd_context
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/customers',
+    tags=['Customers'] 
+)
 
 
 @router.post("/register_customer", response_model=CreateCustomerResponse)
