@@ -44,7 +44,15 @@ def get_current_user(token: str = Depends(oauth2_scheme),
     )
 
     token = verify_access_token(token, credentials_exception)
+    # print("Token is.......:", token)
+    # print("username in Token  is.......:", token.username)
 
-    user = db.query(Customer).filter(Customer.id == token.id).first()
+
+    user = db.query(Customer).filter(Customer.username == token.username).first()
+    # print("user is....:", user)
+    # print(type(user))
+    # object -> id: int & username: str
+    # print("username is:", user.username)
+    # print("user id is:", user.id)
 
     return user
