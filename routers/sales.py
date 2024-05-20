@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status 
 from schemas import MakeSaleRequest, SaleResponse, UpdateSaleRequest, UpdateSaleResponse
-from models import Product, Customer, Sale
+from models import Product, SalesAgent, Sale
 from database import get_db
 from sqlalchemy.orm import Session, joinedload
 from oauth2 import get_current_user
@@ -46,15 +46,11 @@ async def make_sale(sale_request: MakeSaleRequest, db: Session = Depends(get_db)
     # Calculate the total price
     total_price = product.quantity * sale_request.quantity_bought
 
-    # seller name
-    # seller_name = current_user.username
-    # print("Seller name is from current_user", seller_name)
-    # create a new sale record
     new_sale = Sale(
         pid=product.id,
         quantity_bought=sale_request.quantity_bought,
         created_at=datetime.utcnow(),
-        customer_id=current_user.id,
+        SalesAgent_id=current_user.id,
         buyer_first_name=sale_request.buyer_first_name,
         buyer_last_name=sale_request.buyer_last_name,
         seller=current_user.username,
@@ -69,7 +65,6 @@ async def make_sale(sale_request: MakeSaleRequest, db: Session = Depends(get_db)
     db.refresh(new_sale)
 
     # the response
-   
 
     sale_response = SaleResponse(
         sale_id=new_sale.id,
@@ -138,7 +133,7 @@ async def get_all_sales(db: Session = Depends(get_db),
 
 @router.put("sale/{sale_id}", response_model=SaleResponse)
 async def update_sale(sale_id: int, update_request: UpdateSaleRequest, db: Session = Depends(get_db), 
-                         current_user=Depends(get_current_user)):
+                        current_user=Depends(get_current_user)):
     sale = db.query(Sale).options(joinedload(Sale.product)).filter(Sale.id == sale_id).first()
     if not sale:
         raise HTTPException(

@@ -17,15 +17,17 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-class Customer(Base):
-    __tablename__ = "customers"
+
+class SalesAgent(Base):
+    __tablename__ = "salesagents"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(100), nullable=False)
     password = Column(String(255), nullable=False)
     email = Column(String(100), nullable=False)
  
-    sales = relationship('Sale', back_populates='customer')
+    sales = relationship('Sale', back_populates='sales_agent')
+
 
 class Product(Base):
     __tablename__ = 'products'
@@ -48,13 +50,13 @@ class Sale(Base):
     pid = Column(Integer, ForeignKey('products.id'), nullable=False)
     quantity_bought = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
+    sales_agent_id = Column(Integer, ForeignKey('salesagents.id'), nullable=False)
     buyer_first_name = Column(String(100), nullable=False)
     buyer_last_name = Column(String(100), nullable=False)
     seller = Column(String(100), nullable=False)
     total_price = Column(Float, nullable=False)
 
-    customer = relationship('Customer', back_populates='sales')
+    sales_agent = relationship('SalesAgent', back_populates='sales')
     product = relationship("Product", back_populates="sales")
 
 

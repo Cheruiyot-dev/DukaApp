@@ -24,13 +24,13 @@ class UserInDB(User):
     hashed_password: str
 
 
-class CreateCustomerRequest(BaseModel):
+class CreateSalesAgentRequest(BaseModel):
     username: str
     email: EmailStr
     password: str
 
 
-class CreateCustomerResponse(BaseModel):
+class CreateSalesAgentResponse(BaseModel):
     id: int
     username: str
     email: EmailStr
@@ -99,3 +99,4 @@ class UpdateSaleResponse(BaseModel):
     quantity_bought: Optional[str] = None
     created_at: datetime
     total_price: Optional[float] = None
+
